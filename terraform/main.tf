@@ -116,11 +116,11 @@ resource "aws_instance" "ttt_inst" {
               
               cd /home/ubuntu
     
-              git clone https://github.com/pwr-cloudprogramming/a1-mertkodzhaaslan.git
+              git clone https://github.com/pwr-cloudprogramming/a10-mertkodzhaaslan.git
               
               cd /home/ubuntu
     
-              cd a1-mertkodzhaaslan
+              cd a10-mertkodzhaaslan
     
               docker-compose up -d
   EOF
