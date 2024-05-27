@@ -56,34 +56,52 @@ resource "aws_route_table_association" "a" {
 
 
 
+
+
+
 resource "aws_security_group" "allow_ssh_http" {
-name = "allow_ssh_http"
-description = "Allow SSH and HTTP inbound traffic and all outbound traffic"
-vpc_id = aws_vpc.ttt_vpc.id
-tags = {
-Name = "allow-ssh-http"
-}
-}
+  name        = "allow_ssh_http"
+  description = "Allow SSH, HTTP, and backend traffic"
+  vpc_id      = aws_vpc.ttt_vpc.id
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
-  security_group_id = aws_security_group.allow_ssh_http.id
-  cidr_ipv4 = "0.0.0.0/0"
-  ip_protocol = "-1" # all ports
-}
-resource "aws_vpc_security_group_ingress_rule" "allow_http" {
-  security_group_id = aws_security_group.allow_ssh_http.id
-  cidr_ipv4 = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port = 8080
-  to_port = 8081
-}
-resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
-  security_group_id = aws_security_group.allow_ssh_http.id
-  cidr_ipv4 = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port = 22
-  to_port = 22
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+  from_port   = 8080
+  to_port     = 8081
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow-ssh-http"
+  }
 }
 
 
