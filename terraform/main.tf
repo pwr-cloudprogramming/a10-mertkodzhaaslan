@@ -115,19 +115,19 @@ resource "aws_instance" "ttt_inst" {
 
   user_data = <<-EOF
     #!/bin/bash
-              sudo apt-get update
-              sudo apt-get install docker.io -y
+              apt-get update
+              apt-get install docker.io -y
             
               
               
-              sudo systemctl start docker
-              sudo systemctl enable docker
+              systemctl start docker
+              systemctl enable docker
               
-              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
+              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
               
-              sudo usermod -a -G docker $(whoami)
-              sudo usermod -aG docker ubuntu
+              usermod -a -G docker $(whoami)
+              usermod -aG docker ubuntu
               newgrp docker
              
             
