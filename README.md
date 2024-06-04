@@ -15,6 +15,8 @@ This project is a TicTacToe game application that uses AWS Cognito for user auth
 ![loginpage](image-1.png)
 ![register](image-2.png)
 ![verify](image-3.png)
+![login](image-4.png)
+![mainpage](image-5.png)
 
 ## Reflections
 

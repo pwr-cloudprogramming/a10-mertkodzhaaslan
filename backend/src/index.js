@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
-const { signUp, signIn, confirmSignUp } = require('./authService');
+const { signUp, signIn, confirmSignUp } = require('./authService'); 
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
@@ -14,77 +14,77 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        await signUp(email, password);
-        res.status(200).send('Success! Check your email ');
-    } catch (err) {
-        res.status(400).send(err.message);
-    }
+  const { email, password } = req.body;
+  try {
+    await signUp(email, password);
+    res.status(200).send('Registrated!.');
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const authResult = await signIn(email, password);
-        res.status(200).json(authResult);
-    } catch (err) {
-        res.status(400).send(err.message);
-    }
+  const { email, password } = req.body;
+  try {
+    const authResult = await signIn(email, password);
+    res.status(200).json(authResult);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
 app.post('/verify', async (req, res) => {
-    const { email, code } = req.body;
-    try {
-        await confirmSignUp(email, code);
-        res.status(200).send('Confirmed');
-    } catch (err) {
-        res.status(400).send(err.message);
-    }
-});
+	const { email, code } = req.body;
+	try {
+	  await confirmSignUp(email, code);
+	  res.status(200).send('Verificated!');
+	} catch (err) {
+	  res.status(400).send(err.message);
+	}
+  });
 
 io.on('connection', function (socket) {
-    socket.on('startGame', function (data) {
-        socket.join(groups);
-        socket.emit('new', { name: data.name, group: groups });
-        groups++;
-    });
+  socket.on('startGame', function (data) {
+    socket.join(groups);
+    socket.emit('new', { name: data.name, group: groups });
+    groups++;
+  });
 
-    socket.on('joinGame', function (data) {
-        const group = io.sockets.adapter.rooms.get(data.group);
-        if (group && group.size == 1) {
-            socket.join(data.group);
-            socket.broadcast.to(data.group).emit('player1', {});
-            socket.emit('player2', { name: data.name, group: data.group });
-        } else if (group && group.size > 1) {
-            socket.emit('err', { message: 'Full' });
-        } else {
-            socket.emit('err', { message: 'Invalid ID!' });
-        }
-    });
+  socket.on('joinGame', function (data) {
+    const room = io.sockets.adapter.rooms[data.group];
+    if (room && room.length == 1) {
+      socket.join(data.group);
+      socket.broadcast.to(data.group).emit('player1', {});
+      socket.emit('player2', { name: data.name, group: data.group });
+    } else if (room && room.length > 1) {
+      socket.emit('err', { message: 'FULL' });
+    } else {
+      socket.emit('err', { message: 'BAD ID!' });
+    }
+  });
 
-    socket.on('nextTurn', function (data) {
-        socket.broadcast.to(data.group).emit('toNext', {
-            box: data.box,
-            group: data.group,
-        });
+  socket.on('nextTurn', function (data) {
+    socket.broadcast.to(data.group).emit('toNext', {
+      box: data.box,
+      group: data.group,
     });
+  });
 
-    socket.on('gameOver', function (data) {
-        if (data.winner) {
-            socket.emit('endGame', { winner: data.winner, message: 'You win!' });
-            socket.to(data.group).emit('endGame', { winner: data.winner, message: 'You lose!' });
-        } else {
-            io.in(data.group).emit('endGame', { message: data.message });
-        }
-    });
+  socket.on('gameOver', function (data) {
+    if (data.winner) {
+      socket.emit('endGame', { winner: data.winner, message: 'WON!' });
+      socket.to(data.group).emit('endGame', { winner: data.winner, message: 'LOST!' });
+    } else {
+      io.in(data.group).emit('endGame', { message: data.message });
+    }
+  });
 
-    socket.on('reset', function (data) {
-        io.in(data.group).emit('resetGame');
-    });
+  socket.on('reset', function (data) {
+    io.in(data.group).emit('resetGame');
+  });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`listening on ${PORT}`);
+  console.log(`listening on ${PORT}`);
 });
